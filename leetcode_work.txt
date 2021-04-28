@@ -1,0 +1,342 @@
+I don't understand (yet) why this doesn't work:
+
+let letters = 0;
+
+var isAnagram2 = function(s, t) {
+    if (s.length !== t.length) return (!!0);
+    let sa = s.split('');
+    let ta = t.split('');
+    for (let i = 0; i < s.length; i++) {
+        let isLetter = 0;
+        for (let j = 0; j < t.length; j++) {
+            if (t[j] === s[i]) {
+                isLetter = 1;
+                s[i] = '';
+                j = t.length;
+            }
+        }
+        if (isLetter === 1) {
+            letters++;
+        }
+    }
+    if (letters === t.length) {return !!1;} else {return !!0;} 
+};
+
+console.log(isAnagram2("a","b"))
+// false
+
+SOln. Developed by Chris Seiter, Calvin Francis, Esrat, et al.
+
+var isAnagram = function(s, t) {
+    if (s.length === t.length) {
+        newS = s.split('').sort().join('').trim();
+        newT = t.split('').sort().join('').trim();
+        return newS === newT;
+    }
+    else {return false}; 
+};
+
+
+
+
+Leet Code Standard Solutions:
+
+Solution
+Approach #1 (Sorting) [Accepted]
+Algorithm
+
+An anagram is produced by rearranging the letters of ss into tt. Therefore, if tt is an anagram of ss, sorting both strings will result in two identical strings. Furthermore, if ss and tt have different lengths, tt must not be an anagram of ss and we can return early.
+
+public boolean isAnagram(String s, String t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    char[] str1 = s.toCharArray();
+    char[] str2 = t.toCharArray();
+    Arrays.sort(str1);
+    Arrays.sort(str2);
+    return Arrays.equals(str1, str2);
+}
+Complexity analysis
+
+Time complexity : O(n \log n)O(nlogn). Assume that nn is the length of ss, sorting costs O(n \log n)O(nlogn) and comparing two strings costs O(n)O(n). Sorting time dominates and the overall time complexity is O(n \log n)O(nlogn).
+
+Space complexity : O(1)O(1). Space depends on the sorting implementation which, usually, costs O(1)O(1) auxiliary space if heapsort is used. Note that in Java, toCharArray() makes a copy of the string so it costs O(n)O(n) extra space, but we ignore this for complexity analysis because:
+
+It is a language dependent detail.
+It depends on how the function is designed. For example, the function parameter types can be changed to char[].
+Approach #2 (Hash Table) [Accepted]
+Algorithm
+
+To examine if tt is a rearrangement of ss, we can count occurrences of each letter in the two strings and compare them. Since both ss and tt contain only letters from a-za−z, a simple counter table of size 26 is suffice.
+
+Do we need two counter tables for comparison? Actually no, because we could increment the counter for each letter in ss and decrement the counter for each letter in tt, then check if the counter reaches back to zero.
+
+public boolean isAnagram(String s, String t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    int[] counter = new int[26];
+    for (int i = 0; i < s.length(); i++) {
+        counter[s.charAt(i) - 'a']++;
+        counter[t.charAt(i) - 'a']--;
+    }
+    for (int count : counter) {
+        if (count != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+Or we could first increment the counter for ss, then decrement the counter for tt. If at any point the counter drops below zero, we know that tt contains an extra letter not in ss and return false immediately.
+
+public boolean isAnagram(String s, String t) {
+    if (s.length() != t.length()) {
+        return false;
+    }
+    int[] table = new int[26];
+    for (int i = 0; i < s.length(); i++) {
+        table[s.charAt(i) - 'a']++;
+    }
+    for (int i = 0; i < t.length(); i++) {
+        table[t.charAt(i) - 'a']--;
+        if (table[t.charAt(i) - 'a'] < 0) {
+            return false;
+        }
+    }
+    return true;
+}
+Complexity analysis
+
+Time complexity : O(n)O(n). Time complexity is O(n)O(n) because accessing the counter table is a constant time operation.
+
+Space complexity : O(1)O(1). Although we do use extra space, the space complexity is O(1)O(1) because the table's size stays constant no matter how large nn is.
+
+Follow up
+
+What if the inputs contain unicode characters? How would you adapt your solution to such case?
+
+Answer
+
+Use a hash table instead of a fixed size counter. Imagine allocating a large size array to fit the entire range of unicode characters, which could go up to more than 1 million. A hash table is a more generic solution and could adapt to any range of characters.
+
+Report Article Issue
+
+Comments: 135
+BestMost VotesNewest to OldestOldest to Newest
+Type comment here... (Markdown is supported)
+
+Preview
+
+Post
+beethovenzhang's avatar
+beethovenzhang
+126
+October 25, 2018 10:02 PM
+
+Read More
+Solution for the follow up question
+
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        HashMap<Character,Integer> smap=new HashMap<>();
+        int sl=s.length();
+        int tl=t.length();
+        if(sl!=tl){return false;}
+        for(int i=0;i<sl;i++){
+            smap.put(s.charAt(i),smap.getOrDefault(s.charAt(i),0)+1);
+            smap.put(t.charAt(i),smap.getOrDefault(t.charAt(i),0)-1);
+        }
+        for(char c:smap.keySet()){
+            if(smap.get(c)!=0){return false;}
+        }
+        
+        return true;
+    }
+}
+The hashtable should handle all unicode characters. The time complexity is still O(n) while the space complexity becomes O(n) because of the hashtable.
+
+48
+Show 11 replies
+Reply
+Share
+Report
+viccco's avatar
+viccco
+70
+March 25, 2019 1:57 AM
+
+Read More
+Hash method is really a intelligent one!
+
+68
+Show 2 replies
+Reply
+Share
+Report
+wuwei41's avatar
+wuwei41
+23
+Last Edit: July 1, 2019 1:07 AM
+
+Read More
+One liner:
+return collections.Counter(s) == collections.Counter(t)
+
+22
+Show 1 reply
+Reply
+Share
+Report
+dengjiangzhoureal's avatar
+dengjiangzhoureal
+131
+November 30, 2018 1:23 AM
+
+Read More
+My Python solution:
+
+
+ def isAnagram(self, s, t):
+        if len(s) != len(t):
+            return False
+        return sorted(s) == sorted(t)
+
+81
+Show 11 replies
+Reply
+Share
+Report
+Stick_to_it's avatar
+Stick_to_it
+8
+March 12, 2019 5:51 AM
+
+Read More
+However, I don't understand why the Space complexity of Approach 1 is O(1). OvO
+
+8
+Show 8 replies
+Reply
+Share
+Report
+knarfamlap's avatar
+knarfamlap
+10
+February 10, 2019 9:36 AM
+
+Read More
+def isAnagram(self, s, t):
+
+    return sorted(s) == sorted(t)
+9
+Show 7 replies
+Reply
+Share
+Report
+codeXcode's avatar
+codeXcode
+39
+Last Edit: October 12, 2018 10:31 AM
+
+Read More
+class Solution {
+public:
+bool isAnagram(string s, string t) {
+
+    if(s.length()!=t.length())
+        return false;
+    
+    int mapS[26]={0}, mapT[26]={0};
+    
+    for(int i=0;i<s.length();i++){
+        mapS[s[i]-'a']++;
+        mapT[t[i]-'a']++;
+    }
+        
+    for(int i=0;i<26;i++){
+        if(mapS[i]!=mapT[i])
+            return false;
+    }
+    return true;
+}
+};
+
+3
+Show 2 replies
+Reply
+Share
+Report
+AbelValdez's avatar
+AbelValdez
+4
+June 29, 2018 6:27 PM
+
+Read More
+JavaScript Solution:
+
+var isAnagram = function(s, t) {
+    return (sortStr(s) === sortStr(t));
+    
+};
+var sortStr = (str)=>{
+    return str.split('').sort().join('')        
+}
+4
+Show 4 replies
+Reply
+Share
+Report
+al-abbasi's avatar
+al-abbasi
+22
+July 29, 2019 8:41 PM
+
+Read More
+Just keeping track of the character count in each string with a dictionary, similar to the hashmap solution
+
+class Solution(object):
+    def isAnagram(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: bool
+        """
+        if len(s) != len(t):
+            return False
+
+        chars = {}
+        for i in s:
+            if i in chars:
+                chars[i] += 1
+            else:
+                chars[i] = 1
+        for x in t:
+            if x in chars:
+                chars[x] -= 1
+            else:
+                return False
+        for c in chars:
+            if chars[c] != 0:
+                return False
+        return True
+2
+Reply
+Share
+Report
+reout's avatar
+reout
+2
+Last Edit: November 20, 2018 11:20 AM
+
+Read More
+My Python solution:
+
+def isAnagram(self, s, t):
+
+    if s == t: return True
+    sorted_s = sorted(s)
+    sorted_t = sorted(t)
+    if sorted_s == sorted_t :
+        return True
+    else: return False
